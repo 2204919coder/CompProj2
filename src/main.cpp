@@ -31,53 +31,81 @@ motor IntakeRight = motor(PORT13,false);
 motor IntakeLeft = motor(PORT14,true);
 motor_group Intake = motor_group(IntakeLeft,IntakeRight);
 
-void testRun() {
+void setup() {
   BottomChain.setVelocity(75,pct);
   TopChain.setVelocity(100,pct);
   Intake.setVelocity(100,pct);
-  TopChain.spinFor(forward,4000,deg,false);
-  BottomChain.spinFor(forward,3000,deg,false);
-  Intake.spinFor(forward,7,seconds);
   
   //Set door
-
-
-  // LeftFront.setVelocity(100,pct);
-  // LeftBack.setVelocity(100,pct);
-  // RightFront.setVelocity(100,pct);
-  // RightBack.setVelocity(100,pct);
-  
-  // LeftFront.spin(forward);
-  // LeftBack.spin(forward);
-  // RightFront.spin(forward);
-  // RightBack.spin(forward);
   
 }
-/*---------------------------------------------------------------------------*/
-/*                          Pre-Autonomous Functions                         */
-/*                                                                           */
-/*  You may want to perform some actions before the competition starts.      */
-/*  Do them in the following function.  You must return from this function   */
-/*  or the autonomous and usercontrol tasks will not be started.  This       */
-/*  function is only called once after the V5 has been powered on and        */
-/*  not every time that the robot is disabled.                               */
-/*---------------------------------------------------------------------------*/
+
+
+/*
+------------------------------------------------------------------------
+ Where my declared functions go
+------------------------------------------------------------------------
+*/
+
+//Lift System
+void spinUp() {
+  TopChain.spin(forward);
+  BottomChain.spin(forward);
+}
+
+void spinDown() {
+  TopChain.spin(reverse);
+  BottomChain.spin(reverse);
+}
+
+void stop() {
+  TopChain.stop();
+  BottomChain.stop();
+}
+
+void removeClog() {
+  float moveTime = 0.2f;
+  //Move forward and back 
+  // if(TopChain.isSpinning() || BottomChain.isSpinning()) {
+  //   //Save direction
+  //   directionType currentDir = TopChain.direction();
+  //   Controller.Screen.clearScreen();
+  //   Controller.Screen.print((directionType)currentDir == forward ? "reverse" : "forward");
+  //   //Forward and back
+  //   TopChain.spin(((directionType)currentDir == forward ? reverse : forward));
+  //   BottomChain.spin(((directionType)currentDir == forward ? reverse : forward));
+  //   wait(moveTime,sec);
+  //   //Restart chain lift
+  //   TopChain.spin(currentDir);
+  //   TopChain.spin(currentDir);
+  // } else {
+    TopChain.spin(forward);
+    BottomChain.spin(forward);
+    wait(moveTime,sec);
+    TopChain.spin(reverse);
+    BottomChain.spin(reverse);
+    wait(moveTime,sec);
+    TopChain.stop();
+    BottomChain.stop();
+  // }
+}
+
+//Intake
+
+
+/*
+----------------------------------------------------------------------
+Controller buttons
+----------------------------------------------------------------------
+*/
+
+void controller_R2_Pressed() {
+  // removeClog();
+}
 
 void pre_auton(void) {
 
-  // All activities that occur before the competition starts
-  // Example: clearing encoders, setting servo positions, ...
 }
-
-/*---------------------------------------------------------------------------*/
-/*                                                                           */
-/*                              Autonomous Task                              */
-/*                                                                           */
-/*  This task is used to control your robot during the autonomous phase of   */
-/*  a VEX Competition.                                                       */
-/*                                                                           */
-/*  You must modify the code to add your own robot specific commands here.   */
-/*---------------------------------------------------------------------------*/
 
 void autonomous(void) {
   // ..........................................................................
@@ -85,33 +113,24 @@ void autonomous(void) {
   // ..........................................................................
 }
 
-/*---------------------------------------------------------------------------*/
-/*                                                                           */
-/*                              User Control Task                            */
-/*                                                                           */
-/*  This task is used to control your robot during the user control phase of */
-/*  a VEX Competition.                                                       */
-/*                                                                           */
-/*  You must modify the code to add your own robot specific commands here.   */
-/*---------------------------------------------------------------------------*/
-
 void usercontrol(void) {
+  // 1 is top, 2 is bottom
+  Controller.ButtonL1.pressed(stop);
+  Controller.ButtonL2.pressed(spinDown);
+  Controller.ButtonR1.pressed(removeClog);
+  Controller.ButtonR2.pressed(spinUp);
   LeftWheel.spin(forward);
   RightWheel.spin(forward);
-  // User control code here, inside the loop
-  while (1) {
-    // This is the main execution loop for the user control program.
-    // Each time through the loop your program should update motor + servo
-    // values based on feedback from the joysticks.
-
-    // ........................................................................
-    // Insert user code here. This is where you use the joystick values to
-    // update your motors, etc.
-    // ........................................................................
-    LeftWheel.setVelocity(Controller.Axis3.position() * 100,pct);
-    RightWheel.setVelocity(Controller.Axis3.position() * 100,pct);
-    wait(20, msec); // Sleep the task for a short amount of time to
-                    // prevent wasted resources.
+  while (true) {
+    if(Controller.Axis3.position() != 0) {
+      LeftWheel.setVelocity(Controller.Axis3.position() * 100,pct);
+      RightWheel.setVelocity(Controller.Axis3.position() * 100,pct);
+    } else {
+      LeftWheel.setVelocity(Controller.Axis1.position() * 100,pct);
+      RightWheel.setVelocity(-Controller.Axis1.position() * 100,pct);
+    }
+    
+    wait(20, msec); // Sleep the task for a short amount of time to prevent wasted resources.
   }
 }
 
@@ -119,8 +138,10 @@ void usercontrol(void) {
 // Main will set up the competition functions and callbacks.
 //
 int main() {
-  // testRun();
+  setup();
   usercontrol();
+  
+  
   // Set up callbacks for autonomous and driver control periods.
   Competition.autonomous(autonomous);
   Competition.drivercontrol(usercontrol);
