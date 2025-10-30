@@ -31,38 +31,31 @@ motor IntakeRight = motor(PORT13,false);
 motor IntakeLeft = motor(PORT14,true);
 motor_group Intake = motor_group(IntakeLeft,IntakeRight);
 
-void setup() {
-  BottomChain.setVelocity(75,pct);
-  TopChain.setVelocity(100,pct);
-  Intake.setVelocity(100,pct);
-  
-  //Set door
-  
-}
+motor sorter = motor(PORT21,false); //! Allways use timeout!!!
+optical colorSensor = optical(PORT15);
+
+
 
 
 /*
 ------------------------------------------------------------------------
- Where my declared functions go
+Where my declared functions go
 ------------------------------------------------------------------------
 */
 
-//Lift System
+//? Lift System
 void spinUp() {
   TopChain.spin(forward);
   BottomChain.spin(forward);
 }
-
 void spinDown() {
   TopChain.spin(reverse);
   BottomChain.spin(reverse);
 }
-
 void stop() {
   TopChain.stop();
   BottomChain.stop();
 }
-
 void removeClog() {
   float moveTime = 0.2f;
   //Move forward and back 
@@ -79,18 +72,56 @@ void removeClog() {
   //   TopChain.spin(currentDir);
   //   TopChain.spin(currentDir);
   // } else {
-    TopChain.spin(forward);
-    BottomChain.spin(forward);
-    wait(moveTime,sec);
-    TopChain.spin(reverse);
-    BottomChain.spin(reverse);
-    wait(moveTime,sec);
-    TopChain.stop();
-    BottomChain.stop();
+  TopChain.spin(forward);
+  BottomChain.spin(forward);
+  wait(moveTime,sec);
+  TopChain.spin(reverse);
+  BottomChain.spin(reverse);
+  wait(moveTime,sec);
+  TopChain.stop();
+  BottomChain.stop();
   // }
 }
 
-//Intake
+//? Intake
+void intakeIn() {Intake.spin(forward);}
+void intakeOut() {Intake.spin(reverse);}
+void intakeStop() {Intake.stop();}
+
+
+//? Sorter
+void calibrateDoor() { //* calibrateSortingDoor
+  /*
+  Set Max torque
+  Set Timeout
+  Close door
+  Reset position to be zero
+  Reset Max torque
+  */
+  sorter.setMaxTorque(20,pct);
+  sorter.setTimeout(1,sec);
+  sorter.spinFor(143,degrees); //Closes door
+  sorter.resetPosition();
+  sorter.setMaxTorque(50,pct);
+}
+
+void openDoor() {
+  sorter.setTimeout(2,sec);
+  sorter.spinFor(-143,degrees);
+}
+void closeDoor() {
+  sorter.setTimeout(2,sec);
+  sorter.spinFor(143,degrees);
+}
+
+//! Emergency Stop (Stop all motors)
+void stopAll() {
+  BottomChain.stop();
+  TopChain.stop();
+  Intake.stop();
+}
+
+
 
 
 /*
@@ -103,8 +134,17 @@ void controller_R2_Pressed() {
   // removeClog();
 }
 
+void setup() {
+  BottomChain.setVelocity(75,pct);
+  TopChain.setVelocity(100,pct);
+  Intake.setVelocity(100,pct);
+  sorter.setVelocity(100,pct);
+  sorter.setStopping(brake);
+  //Set door
+  calibrateDoor();
+}
 void pre_auton(void) {
-
+  
 }
 
 void autonomous(void) {
@@ -119,6 +159,9 @@ void usercontrol(void) {
   Controller.ButtonL2.pressed(spinDown);
   Controller.ButtonR1.pressed(removeClog);
   Controller.ButtonR2.pressed(spinUp);
+  Controller.ButtonA.pressed(intakeIn);
+  Controller.ButtonB.pressed(intakeOut);
+  Controller.ButtonDown.pressed(stopAll);
   LeftWheel.spin(forward);
   RightWheel.spin(forward);
   while (true) {
