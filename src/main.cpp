@@ -105,14 +105,30 @@ void calibrateDoor() { //* calibrateSortingDoor
   sorter.setMaxTorque(50,pct);
 }
 
+bool isdoorOpen = false;
 void openDoor() {
+  if(isdoorOpen) return;
   sorter.setTimeout(2,sec);
-  sorter.spinFor(-143,degrees);
+  sorter.spinFor(-155,degrees);
+  isdoorOpen = true;
 }
 void closeDoor() {
+  if(!isdoorOpen) return;
   sorter.setTimeout(2,sec);
-  sorter.spinFor(143,degrees);
+  sorter.spinFor(155,degrees);
+  isdoorOpen = false;
 }
+
+void checkDoor() {
+  if(colorSensor.isNearObject()) {
+    if(colorSensor.hue() >= 150 && colorSensor.hue() <= 310) { //* blue ish
+      closeDoor();
+    } else { //* red ish
+      openDoor();
+    }
+  }
+}
+
 
 //! Emergency Stop (Stop all motors)
 void stopAll() {
@@ -140,6 +156,8 @@ void setup() {
   Intake.setVelocity(100,pct);
   sorter.setVelocity(100,pct);
   sorter.setStopping(brake);
+  colorSensor.setLightPower(75,pct);
+  colorSensor.setLight(ledState::on);
   //Set door
   calibrateDoor();
 }
@@ -162,9 +180,15 @@ void usercontrol(void) {
   Controller.ButtonA.pressed(intakeIn);
   Controller.ButtonB.pressed(intakeOut);
   Controller.ButtonDown.pressed(stopAll);
+  Controller.ButtonLeft.pressed(closeDoor);
+  Controller.ButtonRight.pressed(openDoor);
   LeftWheel.spin(forward);
   RightWheel.spin(forward);
   while (true) {
+    // Controller.Screen.clearScreen();
+    // Controller.Screen.setCursor(0,0);
+    // Controller.Screen.print(colorSensor.hue());
+    checkDoor();
     if(Controller.Axis3.position() != 0) {
       LeftWheel.setVelocity(Controller.Axis3.position() * 100,pct);
       RightWheel.setVelocity(Controller.Axis3.position() * 100,pct);
