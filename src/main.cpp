@@ -42,19 +42,26 @@ optical colorSensor = optical(PORT15);
 Where my declared functions go
 ------------------------------------------------------------------------
 */
+//? Intake
+void intakeIn() {Intake.spin(forward);}
+void intakeOut() {Intake.spin(reverse);}
+void intakeStop() {Intake.stop();}
 
 //? Lift System
 void spinUp() {
   TopChain.spin(forward);
   BottomChain.spin(forward);
+  intakeIn();
 }
 void spinDown() {
   TopChain.spin(reverse);
   BottomChain.spin(reverse);
+  intakeOut();
 }
 void stop() {
   TopChain.stop();
   BottomChain.stop();
+  intakeStop();
 }
 void removeClog() {
   float moveTime = 0.2f;
@@ -83,10 +90,6 @@ void removeClog() {
   // }
 }
 
-//? Intake
-void intakeIn() {Intake.spin(forward);}
-void intakeOut() {Intake.spin(reverse);}
-void intakeStop() {Intake.stop();}
 
 
 //? Sorter
@@ -98,13 +101,14 @@ void calibrateDoor() { //* calibrateSortingDoor
   Reset position to be zero
   Reset Max torque
   */
-  sorter.setMaxTorque(20,pct);
-  sorter.setTimeout(1,sec);
-  sorter.spinFor(143,degrees); //Closes door
-  sorter.resetPosition();
-  sorter.setMaxTorque(50,pct);
+ sorter.setMaxTorque(20,pct);
+ sorter.setTimeout(1,sec);
+ sorter.spinFor(143,degrees); //Closes door
+ sorter.resetPosition();
+ sorter.setMaxTorque(50,pct);
 }
 
+bool isDoorAuto = true;
 bool isdoorOpen = false;
 void openDoor() {
   if(isdoorOpen) return;
@@ -129,6 +133,10 @@ void checkDoor() {
   }
 }
 
+void toogleDoor() {
+  //! print on scree
+  isDoorAuto = !isDoorAuto;
+}
 
 //! Emergency Stop (Stop all motors)
 void stopAll() {
@@ -173,22 +181,31 @@ void autonomous(void) {
 
 void usercontrol(void) {
   // 1 is top, 2 is bottom
-  Controller.ButtonL1.pressed(stop);
-  Controller.ButtonL2.pressed(spinDown);
-  Controller.ButtonR1.pressed(removeClog);
-  Controller.ButtonR2.pressed(spinUp);
-  Controller.ButtonA.pressed(intakeIn);
-  Controller.ButtonB.pressed(intakeOut);
-  Controller.ButtonDown.pressed(stopAll);
-  Controller.ButtonLeft.pressed(closeDoor);
-  Controller.ButtonRight.pressed(openDoor);
+  Controller.ButtonR1.pressed();
+  Controller.ButtonR2.pressed();
+  Controller.ButtonL1.pressed();
+  Controller.ButtonL2.pressed();
+  Controller.ButtonA.pressed();
+  Controller.ButtonB.pressed();
+  Controller.ButtonX.pressed();
+  Controller.ButtonY.pressed();
+  Controller.ButtonUp.pressed();
+  Controller.ButtonDown.pressed();
+  Controller.Button.pressed();
+  Controller.ButtonR1.pressed();
+  Controller.ButtonR1.pressed();
+  Controller.ButtonR1.pressed();
   LeftWheel.spin(forward);
   RightWheel.spin(forward);
+  
   while (true) {
     // Controller.Screen.clearScreen();
     // Controller.Screen.setCursor(0,0);
     // Controller.Screen.print(colorSensor.hue());
-    checkDoor();
+    if(isDoorAuto) {
+      
+      checkDoor();
+    }
     if(Controller.Axis3.position() != 0) {
       LeftWheel.setVelocity(Controller.Axis3.position() * 100,pct);
       RightWheel.setVelocity(Controller.Axis3.position() * 100,pct);
