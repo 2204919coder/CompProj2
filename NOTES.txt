@@ -1,0 +1,1 @@
+Screen setCursor is 1 indexed (starts at 1 for both row and col)

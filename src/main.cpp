@@ -133,7 +133,7 @@ void checkDoor() {
   }
 }
 
-void toogleDoor() {
+void toggleDoorAuto() {
   //! print on scree
   isDoorAuto = !isDoorAuto;
 }
@@ -153,10 +153,33 @@ void stopAll() {
 Controller buttons
 ----------------------------------------------------------------------
 */
+int moveSpeedPct = 100;
+int turnSpeedPct = 80;
+int speedFactor = 20;
 
-void controller_R2_Pressed() {
-  // removeClog();
+void displayInfo() {
+  // Controller.Screen.clearScreen();
+  Controller.Screen.setCursor(1,1);
+  Controller.Screen.print("Move Speed: %d", moveSpeedPct);
+  Controller.Screen.setCursor(2,1);
+  Controller.Screen.print("Turn Speed: %d", turnSpeedPct);
 }
+
+void moveSpeedUp() {
+  moveSpeedPct += (moveSpeedPct + speedFactor > 100 ? 0 : speedFactor);
+}
+void moveSpeedDown() {
+  moveSpeedPct -= (moveSpeedPct - speedFactor < 0 ? 0 : speedFactor);
+}
+
+void turnSpeedUp() {
+  turnSpeedPct += (turnSpeedPct + speedFactor > 100 ? 0 : speedFactor);
+}
+void turnSpeedDown() {
+  turnSpeedPct -= (turnSpeedPct - speedFactor < 0 ? 0 : speedFactor);
+}
+
+
 
 void setup() {
   BottomChain.setVelocity(75,pct);
@@ -180,21 +203,21 @@ void autonomous(void) {
 }
 
 void usercontrol(void) {
+  // Controller.rumble("...---...");
+  
   // 1 is top, 2 is bottom
-  Controller.ButtonR1.pressed();
-  Controller.ButtonR2.pressed();
-  Controller.ButtonL1.pressed();
-  Controller.ButtonL2.pressed();
-  Controller.ButtonA.pressed();
-  Controller.ButtonB.pressed();
-  Controller.ButtonX.pressed();
-  Controller.ButtonY.pressed();
-  Controller.ButtonUp.pressed();
-  Controller.ButtonDown.pressed();
-  Controller.Button.pressed();
-  Controller.ButtonR1.pressed();
-  Controller.ButtonR1.pressed();
-  Controller.ButtonR1.pressed();
+  // Controller.ButtonR1.pressed();
+  Controller.ButtonR2.pressed(removeClog);
+  // Controller.ButtonL1.pressed();
+  Controller.ButtonL2.pressed(stopAll);
+  // Controller.ButtonA.pressed();
+  Controller.ButtonB.pressed(toggleDoorAuto);
+  // Controller.ButtonX.pressed();
+  // Controller.ButtonY.pressed();
+  Controller.ButtonUp.pressed(moveSpeedUp);
+  Controller.ButtonDown.pressed(moveSpeedDown);
+  Controller.ButtonLeft.pressed(turnSpeedDown);
+  Controller.ButtonRight.pressed(turnSpeedUp);
   LeftWheel.spin(forward);
   RightWheel.spin(forward);
   
@@ -202,18 +225,34 @@ void usercontrol(void) {
     // Controller.Screen.clearScreen();
     // Controller.Screen.setCursor(0,0);
     // Controller.Screen.print(colorSensor.hue());
+    displayInfo();
     if(isDoorAuto) {
       
       checkDoor();
     }
-    if(Controller.Axis3.position() != 0) {
-      LeftWheel.setVelocity(Controller.Axis3.position() * 100,pct);
-      RightWheel.setVelocity(Controller.Axis3.position() * 100,pct);
+    int axis3 = Controller.Axis3.position();
+    int axis1 = Controller.Axis1.position();
+    if(axis1 >= 5 || axis1 <= -5) {
+      LeftWheel.setVelocity(axis1 * turnSpeedPct/100,pct);
+      RightWheel.setVelocity(-axis1 * turnSpeedPct/100,pct);
     } else {
-      LeftWheel.setVelocity(Controller.Axis1.position() * 100,pct);
-      RightWheel.setVelocity(-Controller.Axis1.position() * 100,pct);
+      LeftWheel.setVelocity(axis3 * moveSpeedPct/100,pct);
+      RightWheel.setVelocity(axis3 * moveSpeedPct/100,pct);
     }
-    
+    int axis2 = Controller.Axis2.position();
+    if(axis2 > 10) {
+      spinUp();
+    } else if (axis2 < -10) {
+      spinDown();
+    }
+    if(!isDoorAuto) {
+      int axis4 = Controller.Axis4.position();
+      if(axis4 > 10) {
+        openDoor();
+      } else if (axis4 < -10) {
+        closeDoor();
+      }
+    }
     wait(20, msec); // Sleep the task for a short amount of time to prevent wasted resources.
   }
 }
