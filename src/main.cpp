@@ -17,22 +17,22 @@ vex::brain Brain;
 controller Controller = controller(primary);
 
 // define your global instances of motors and other devices here
-motor RightFront = motor(PORT12, ratio18_1, false);
-motor RightBack = motor(PORT2, ratio18_1, false);
-motor LeftFront = motor(PORT1, ratio18_1, true); 
-motor LeftBack = motor(PORT11, ratio18_1, true);
-motor_group LeftWheel = motor_group(LeftBack,LeftFront);
-motor_group RightWheel = motor_group(RightFront,RightBack);
+motor RightTop = motor(PORT1, ratio18_1, true);
+motor RightBottom = motor(PORT2, ratio18_1, false);
+motor LeftTop = motor(PORT3, ratio18_1, false); 
+motor LeftBottom = motor(PORT4, ratio18_1, true);
+motor_group LeftWheel = motor_group(LeftBottom,LeftTop);
+motor_group RightWheel = motor_group(RightTop,RightBottom);
 
-motor BottomChain = motor(PORT19, ratio36_1, true);
-motor TopChain = motor(PORT20, ratio36_1, false);
+motor BottomChain = motor(PORT20, ratio36_1, true);
+motor TopChain = motor(PORT15, ratio36_1, false);
 
-motor IntakeRight = motor(PORT13,false);
-motor IntakeLeft = motor(PORT14,true);
+motor IntakeRight = motor(PORT12,true);
+motor IntakeLeft = motor(PORT13,false);
 motor_group Intake = motor_group(IntakeLeft,IntakeRight);
 
-motor sorter = motor(PORT21,false); //! Allways use timeout!!!
-optical colorSensor = optical(PORT15);
+motor sorter = motor(PORT14,false); //! Allways use timeout!!!
+optical colorSensor = optical(PORT10);
 
 
 
@@ -126,9 +126,9 @@ void closeDoor() {
 void checkDoor() {
   if(colorSensor.isNearObject()) {
     if(colorSensor.hue() >= 150 && colorSensor.hue() <= 310) { //* blue ish
-      closeDoor();
-    } else { //* red ish
       openDoor();
+    } else { //* red ish
+      closeDoor();
     }
   }
 }
@@ -232,7 +232,7 @@ void usercontrol(void) {
     }
     int axis3 = Controller.Axis3.position();
     int axis1 = Controller.Axis1.position();
-    if(axis1 >= 5 || axis1 <= -5) {
+    if(axis1 >= 80 || axis1 <= -80) {
       LeftWheel.setVelocity(axis1 * turnSpeedPct/100,pct);
       RightWheel.setVelocity(-axis1 * turnSpeedPct/100,pct);
     } else {
