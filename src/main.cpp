@@ -33,7 +33,7 @@ motor_group Intake = motor_group(IntakeLeft,IntakeRight);
 
 motor sorter = motor(PORT14,false); //! Allways use timeout!!!
 optical colorSensor = optical(PORT10);
-
+distance distanceSensor = distance(PORT16);
 
 
 
@@ -90,7 +90,25 @@ void removeClog() {
   // }
 }
 
+timer t = timer();
 
+void spinUpAdv() {
+  //Disable block thing (adv logic) for 5 sec
+  //
+  
+  if(t.value() > 5) {
+    t.reset();
+  }
+  spinUp();
+}
+
+void advSpinCheckLogic() {
+  if(t.value() > 5) {
+    if(distanceSensor.objectDistance(distanceUnits::cm) < 50) {
+      TopChain.stop();
+    }
+  }
+}
 
 //? Sorter
 void calibrateDoor() { //* calibrateSortingDoor
@@ -207,11 +225,11 @@ void usercontrol(void) {
   
   // 1 is top, 2 is bottom
   // Controller.ButtonR1.pressed();
-  Controller.ButtonR2.pressed(removeClog);
+  Controller.ButtonR2.pressed(spinUpAdv);
   // Controller.ButtonL1.pressed();
-  Controller.ButtonL2.pressed(stopAll);
+  Controller.ButtonL2.pressed(spinDown);
   // Controller.ButtonA.pressed();
-  Controller.ButtonB.pressed(toggleDoorAuto);
+  Controller.ButtonB.pressed(stopAll);
   // Controller.ButtonX.pressed();
   // Controller.ButtonY.pressed();
   Controller.ButtonUp.pressed(moveSpeedUp);
@@ -226,6 +244,7 @@ void usercontrol(void) {
     // Controller.Screen.setCursor(0,0);
     // Controller.Screen.print(colorSensor.hue());
     displayInfo();
+    advSpinCheckLogic();
     if(isDoorAuto) {
       
       checkDoor();
@@ -240,19 +259,19 @@ void usercontrol(void) {
       RightWheel.setVelocity(axis3 * moveSpeedPct/100,pct);
     }
     int axis2 = Controller.Axis2.position();
-    if(axis2 > 10) {
-      spinUp();
-    } else if (axis2 < -10) {
-      spinDown();
-    }
-    if(!isDoorAuto) {
-      int axis4 = Controller.Axis4.position();
-      if(axis4 > 10) {
-        openDoor();
-      } else if (axis4 < -10) {
-        closeDoor();
-      }
-    }
+    // if(axis2 > 10) {
+    //   spinUp();
+    // } else if (axis2 < -10) {
+    //   spinDown();
+    // }
+    // if(!isDoorAuto) {
+    //   int axis4 = Controller.Axis4.position();
+    //   if(axis4 > 10) {
+    //     openDoor();
+    //   } else if (axis4 < -10) {
+    //     closeDoor();
+    //   }
+    // }
     wait(20, msec); // Sleep the task for a short amount of time to prevent wasted resources.
   }
 }
