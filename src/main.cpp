@@ -56,7 +56,7 @@ void spinUp() {
 void spinDown() {
   TopChain.spin(reverse);
   BottomChain.spin(reverse);
-  intakeOut();
+  // intakeOut();
 }
 void stop() {
   TopChain.stop();
@@ -81,12 +81,15 @@ void removeClog() {
   // } else {
   TopChain.spin(forward);
   BottomChain.spin(forward);
+  Intake.spin(forward);
   wait(moveTime,sec);
   TopChain.spin(reverse);
   BottomChain.spin(reverse);
+  Intake.spin(reverse);
   wait(moveTime,sec);
   TopChain.stop();
   BottomChain.stop();
+  Intake.stop();
   // }
 }
 
@@ -104,7 +107,11 @@ void spinUpAdv() {
 
 void advSpinCheckLogic() {
   if(t.value() > 5) {
-    if(distanceSensor.objectDistance(distanceUnits::cm) < 50) {
+    if(distanceSensor.objectDistance(distanceUnits::mm) < 50) {
+      // Brain.Screen.clearScreen();
+      // Brain.Screen.setCursor(1,1);
+      // Brain.Screen.print(distanceSensor.objectDistance(distanceUnits::cm));
+      
       TopChain.stop();
     }
   }
@@ -228,7 +235,7 @@ void usercontrol(void) {
   Controller.ButtonR2.pressed(spinUpAdv);
   // Controller.ButtonL1.pressed();
   Controller.ButtonL2.pressed(spinDown);
-  // Controller.ButtonA.pressed();
+  Controller.ButtonA.pressed(removeClog);
   Controller.ButtonB.pressed(stopAll);
   // Controller.ButtonX.pressed();
   // Controller.ButtonY.pressed();
