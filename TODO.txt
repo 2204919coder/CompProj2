@@ -17,9 +17,9 @@ Checklist:
     Drivetrain motors synced
 
 TODO-Features:
-    Arm to push balls in the goal from the Top
-    Disable sorter (for some practical reasons)
-    Alignment mechanism (or code)
-    Test Intake
-    Compatibility in competion auto mode
-    Stability at high speeds-
+[*]    Arm to push balls in the goal from the Top
+[ ]    Disable sorter (for some practical reasons)
+[*]    Alignment mechanism (or code)
+[*]    Test Intake
+[ ]    Compatibility in competion auto mode
+[*]    Stability at high speeds-

@@ -225,7 +225,13 @@ void autonomous(void) {
   // ..........................................................................
   // Insert autonomous user code here.
   // ..........................................................................
+  
+  RightWheel.setVelocity(40,pct);
+  LeftWheel.setVelocity(40,pct);
+  
+  
 }
+
 
 void usercontrol(void) {
   // Controller.rumble("...---...");
@@ -288,8 +294,8 @@ void usercontrol(void) {
 //
 int main() {
   setup();
-  usercontrol();
-  
+  // usercontrol();
+  autonomous();
   
   // Set up callbacks for autonomous and driver control periods.
   Competition.autonomous(autonomous);
