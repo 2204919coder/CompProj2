@@ -23,6 +23,7 @@ motor LeftTop = motor(PORT3, ratio18_1, false);
 motor LeftBottom = motor(PORT4, ratio18_1, true);
 motor_group LeftWheel = motor_group(LeftBottom,LeftTop);
 motor_group RightWheel = motor_group(RightTop,RightBottom);
+drivetrain dTrain = drivetrain(LeftWheel,RightWheel,320,380,0,mm,60.0/84);
 
 motor BottomChain = motor(PORT20, ratio36_1, true);
 motor TopChain = motor(PORT15, ratio36_1, false);
@@ -171,7 +172,13 @@ void stopAll() {
 } 
 
 
-
+void goDeg(int degIn) {
+  LeftWheel.spinFor(degIn, deg,false);
+  RightWheel.spinFor(degIn, deg,true);
+}
+void turnDeg() {
+  
+}
 
 /*
 ----------------------------------------------------------------------
@@ -204,7 +211,11 @@ void turnSpeedDown() {
   turnSpeedPct -= (turnSpeedPct - speedFactor < 0 ? 0 : speedFactor);
 }
 
-
+void printController(char c) {
+  Controller.Screen.clearScreen();
+  Controller.Screen.setCursor(1,1);
+  Controller.Screen.print(c);
+}
 
 void setup() {
   BottomChain.setVelocity(75,pct);
@@ -228,12 +239,15 @@ void autonomous(void) {
   
   RightWheel.setVelocity(40,pct);
   LeftWheel.setVelocity(40,pct);
-  
-  
+  goDeg(1100);
+  dTrain.turnFor(130,deg,true);
+  goDeg(1600);
+  LeftWheel.spinFor(280,deg);
 }
 
-
-void usercontrol(void) {
+//! BUG: When named usercontrol, it seems to run anyways despite being commented out ¯\(ツ)/¯
+//! Simply just changed the name
+void usercontroler(void) {
   // Controller.rumble("...---...");
   
   // 1 is top, 2 is bottom
@@ -294,12 +308,11 @@ void usercontrol(void) {
 //
 int main() {
   setup();
-  // usercontrol();
   autonomous();
   
   // Set up callbacks for autonomous and driver control periods.
-  Competition.autonomous(autonomous);
-  Competition.drivercontrol(usercontrol);
+  // Competition.autonomous(autonomous);
+  // Competition.drivercontrol(usercontrol);
 
   // Run the pre-autonomous function.
   pre_auton();
