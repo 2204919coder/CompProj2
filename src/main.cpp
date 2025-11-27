@@ -176,8 +176,8 @@ void goDeg(int degIn) {
   LeftWheel.spinFor(degIn, deg,false);
   RightWheel.spinFor(degIn, deg,true);
 }
-void turnDeg() {
-  
+void turnDeg(int degIn) {
+  dTrain.turnFor(degIn,deg);
 }
 
 /*
@@ -243,6 +243,17 @@ void autonomous(void) {
   dTrain.turnFor(130,deg,true);
   goDeg(1600);
   LeftWheel.spinFor(280,deg);
+  goDeg(100);
+  spinUp();
+  while(!((colorSensor.hue() >= 150 && colorSensor.hue() <= 310 ) && (distanceSensor.objectDistance(distanceUnits::mm) > 50))) {
+    
+    turnDeg(30);
+    turnDeg(-30);
+    goDeg(50);
+  }
+  stopAll();
+  goDeg(-1000);
+  spinUp();
 }
 
 //! BUG: When named usercontrol, it seems to run anyways despite being commented out ¯\(ツ)/¯
