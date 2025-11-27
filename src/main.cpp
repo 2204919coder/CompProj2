@@ -245,6 +245,7 @@ void autonomous(void) {
   LeftWheel.spinFor(280,deg);
   goDeg(100);
   spinUp();
+  //!BUG: Doesn't correctly stop
   while(!((colorSensor.hue() >= 150 && colorSensor.hue() <= 310 ) && (distanceSensor.objectDistance(distanceUnits::mm) > 50))) {
     
     turnDeg(30);
