@@ -15,6 +15,7 @@ using namespace vex;
 competition Competition;
 vex::brain Brain;
 controller Controller = controller(primary);
+inertial InertialSensor = inertial(PORT19);
 
 // define your global instances of motors and other devices here
 motor RightTop = motor(PORT1, ratio18_1, true);
@@ -23,7 +24,7 @@ motor LeftTop = motor(PORT3, ratio18_1, false);
 motor LeftBottom = motor(PORT4, ratio18_1, true);
 motor_group LeftWheel = motor_group(LeftBottom,LeftTop);
 motor_group RightWheel = motor_group(RightTop,RightBottom);
-drivetrain dTrain = drivetrain(LeftWheel,RightWheel,320,380,0,mm,60.0/84);
+smartdrive dTrain = smartdrive(LeftWheel,RightWheel,InertialSensor,320,380,0,mm,60.0/84);
 
 motor BottomChain = motor(PORT20, ratio36_1, true);
 motor TopChain = motor(PORT15, ratio36_1, false);
@@ -35,7 +36,6 @@ motor_group Intake = motor_group(IntakeLeft,IntakeRight);
 motor sorter = motor(PORT14,false); //! Allways use timeout!!!
 optical colorSensor = optical(PORT10);
 distance distanceSensor = distance(PORT16);
-
 
 
 /*
@@ -225,8 +225,11 @@ void setup() {
   sorter.setStopping(brake);
   colorSensor.setLightPower(75,pct);
   colorSensor.setLight(ledState::on);
+  InertialSensor.calibrate(3);
+  wait(3,sec);
   //Set door
   calibrateDoor();
+  
 }
 void pre_auton(void) {
   
@@ -236,25 +239,32 @@ void autonomous(void) {
   // ..........................................................................
   // Insert autonomous user code here.
   // ..........................................................................
-  
+  InertialSensor.setHeading(-25,deg);
   RightWheel.setVelocity(40,pct);
   LeftWheel.setVelocity(40,pct);
+  dTrain.setTurnVelocityMin(40);
   goDeg(1100);
-  dTrain.turnFor(130,deg,true);
+  dTrain.turnFor(115,deg,true);
   goDeg(1600);
   LeftWheel.spinFor(280,deg);
   goDeg(100);
   spinUp();
   //!BUG: Doesn't correctly stop
-  while(!((colorSensor.hue() >= 150 && colorSensor.hue() <= 310 ) && (distanceSensor.objectDistance(distanceUnits::mm) > 50))) {
+  timer t2 = timer();
+  t2.reset();
+  while(!(colorSensor.hue() >= 150 && colorSensor.hue() <= 310 ) && (distanceSensor.objectDistance(distanceUnits::mm) > 50) && (t2.time(sec) < 5)) {
     
     turnDeg(30);
     turnDeg(-30);
     goDeg(50);
   }
-  stopAll();
+  //* make async to stop ball at top like manual
+  //! Line work working (Anything above works)
+  dTrain.turnToHeading(180,deg);
   goDeg(-1000);
   spinUp();
+  wait(4,seconds);
+  
 }
 
 //! BUG: When named usercontrol, it seems to run anyways despite being commented out ¯\(ツ)/¯
