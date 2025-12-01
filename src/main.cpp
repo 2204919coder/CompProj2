@@ -239,31 +239,36 @@ void autonomous(void) {
   // ..........................................................................
   // Insert autonomous user code here.
   // ..........................................................................
-  InertialSensor.setHeading(-25,deg);
+  InertialSensor.setHeading(23,deg);
   RightWheel.setVelocity(40,pct);
   LeftWheel.setVelocity(40,pct);
   dTrain.setTurnVelocityMin(40);
+  spinUp();
   goDeg(1100);
   dTrain.turnFor(115,deg,true);
   goDeg(1600);
   LeftWheel.spinFor(280,deg);
   goDeg(100);
-  spinUp();
-  //!BUG: Doesn't correctly stop
+  // spinUp();
+  TopChain.stop();
   timer t2 = timer();
   t2.reset();
-  while(!(colorSensor.hue() >= 150 && colorSensor.hue() <= 310 ) && (distanceSensor.objectDistance(distanceUnits::mm) > 50) && (t2.time(sec) < 5)) {
-    
-    turnDeg(30);
-    turnDeg(-30);
-    goDeg(50);
+  for(int i = 0; i < 4 && t2.time(sec) < 5; i++) {
+    turnDeg(20);
+    turnDeg(-20);
+    goDeg(150);
   }
   //* make async to stop ball at top like manual
   //! Line work working (Anything above works)
-  dTrain.turnToHeading(180,deg);
+  // dTrain.turnToHeading(0,deg);
+  // goDeg
+  goDeg(-100);
+  dTrain.turnToHeading(181,deg);
   goDeg(-1000);
   spinUp();
   wait(4,seconds);
+  wait(5,sec);
+  stopAll();
   
 }
 
