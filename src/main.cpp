@@ -37,6 +37,10 @@ motor sorter = motor(PORT14,false); //! Allways use timeout!!!
 optical colorSensor = optical(PORT10);
 distance distanceSensor = distance(PORT16);
 
+//yellow tower
+aivision::colordesc ai_vision_4__COLOR = aivision::colordesc(1, 169, 170, 137, 40, 1);
+// AI Vision Code Descriptions
+aivision ai_vision_4 = aivision(PORT18, ai_vision_4__COLOR, aivision::ALL_OBJECTS);
 
 /*
 ------------------------------------------------------------------------
@@ -263,7 +267,7 @@ void autonomous(void) {
   // dTrain.turnToHeading(0,deg);
   // goDeg
   goDeg(-100);
-  dTrain.turnToHeading(181,deg);
+  dTrain.turnToHeading(181.5,deg);
   goDeg(-1000);
   spinUp();
   wait(4,seconds);
