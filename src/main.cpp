@@ -29,18 +29,19 @@ smartdrive dTrain = smartdrive(LeftWheel,RightWheel,InertialSensor,320,380,0,mm,
 motor BottomChain = motor(PORT20, ratio36_1, true);
 motor TopChain = motor(PORT15, ratio36_1, false);
 
-motor IntakeRight = motor(PORT12,true);
-motor IntakeLeft = motor(PORT13,false);
-motor_group Intake = motor_group(IntakeLeft,IntakeRight);
+motor Intake = motor(PORT12,false);
+motor Lever = motor(PORT13,false);
+// motor IntakeLeft = motor(PORT13,false);
+// motor_group Intake = motor_group(IntakeLeft,IntakeRight);
 
 motor sorter = motor(PORT14,false); //! Allways use timeout!!!
 optical colorSensor = optical(PORT10);
 distance distanceSensor = distance(PORT16);
 
 //yellow tower
-aivision::colordesc ai_vision_4__COLOR = aivision::colordesc(1, 169, 170, 137, 40, 1);
+// aivision::colordesc ai_vision_4__COLOR = aivision::colordesc(1, 169, 170, 137, 40, 1);
 // AI Vision Code Descriptions
-aivision ai_vision_4 = aivision(PORT18, ai_vision_4__COLOR, aivision::ALL_OBJECTS);
+// aivision ai_vision_4 = aivision(PORT18, ai_vision_4__COLOR, aivision::ALL_OBJECTS);
 
 /*
 ------------------------------------------------------------------------
@@ -52,6 +53,27 @@ void intakeIn() {Intake.spin(forward);}
 void intakeOut() {Intake.spin(reverse);}
 void intakeStop() {Intake.stop();}
 
+void calibrateLever() {
+ Lever.setMaxTorque(100,pct);
+ Lever.setTimeout(1,sec);
+ Lever.spinFor(-100,degrees); //Closes door
+ Lever.resetPosition();
+ Lever.setMaxTorque(50,pct);
+}
+bool isLeverDown = false;
+void lowerLever() {
+  if(isLeverDown) return;
+  Lever.setTimeout(2,sec);
+  Lever.spinFor(100,degrees);
+  isLeverDown = true;
+}
+void raiseLever() {
+  if(!isLeverDown) return;
+  Lever.setTimeout(2,sec);
+  Lever.spinFor(-100,degrees);
+  isLeverDown = false;
+}
+
 //? Lift System
 void spinUp() {
   TopChain.spin(forward);
@@ -61,7 +83,7 @@ void spinUp() {
 void spinDown() {
   TopChain.spin(reverse);
   BottomChain.spin(reverse);
-  // intakeOut();
+  intakeOut();
 }
 void stop() {
   TopChain.stop();
@@ -233,7 +255,9 @@ void setup() {
   wait(3,sec);
   //Set door
   calibrateDoor();
-  
+  calibrateLever();
+  Lever.setMaxTorque(100,pct);
+  Lever.setVelocity(100,pct);
 }
 void pre_auton(void) {
   
@@ -282,9 +306,9 @@ void usercontroler(void) {
   // Controller.rumble("...---...");
   
   // 1 is top, 2 is bottom
-  // Controller.ButtonR1.pressed();
+  Controller.ButtonR1.pressed(lowerLever);
   Controller.ButtonR2.pressed(spinUpAdv);
-  // Controller.ButtonL1.pressed();
+  Controller.ButtonL1.pressed(raiseLever);
   Controller.ButtonL2.pressed(spinDown);
   Controller.ButtonA.pressed(removeClog);
   Controller.ButtonB.pressed(stopAll);
@@ -339,14 +363,14 @@ void usercontroler(void) {
 //
 int main() {
   setup();
-  autonomous();
-  
+  // autonomous();
+  usercontroler();
   // Set up callbacks for autonomous and driver control periods.
   // Competition.autonomous(autonomous);
-  // Competition.drivercontrol(usercontrol);
+  // Competition.drivercontrol(usercontroler);
 
   // Run the pre-autonomous function.
-  pre_auton();
+  // pre_auton();
 
   // Prevent main from exiting with an infinite loop.
   while (true) {
