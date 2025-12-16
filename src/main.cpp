@@ -244,7 +244,7 @@ void printController(char c) {
 }
 
 void setup() {
-  BottomChain.setVelocity(75,pct);
+  BottomChain.setVelocity(100,pct); //75 matchs top speed
   TopChain.setVelocity(100,pct);
   Intake.setVelocity(100,pct);
   sorter.setVelocity(100,pct);
@@ -258,6 +258,7 @@ void setup() {
   calibrateLever();
   Lever.setMaxTorque(100,pct);
   Lever.setVelocity(100,pct);
+  Lever.setStopping(hold);
 }
 void pre_auton(void) {
   
@@ -268,35 +269,36 @@ void autonomous(void) {
   // Insert autonomous user code here.
   // ..........................................................................
   InertialSensor.setHeading(23,deg);
-  RightWheel.setVelocity(40,pct);
-  LeftWheel.setVelocity(40,pct);
+  RightWheel.setVelocity(60,pct);
+  LeftWheel.setVelocity(60,pct);
   dTrain.setTurnVelocityMin(40);
   spinUp();
   goDeg(1100);
-  dTrain.turnFor(115,deg,true);
-  goDeg(1600);
-  LeftWheel.spinFor(280,deg);
-  goDeg(100);
-  // spinUp();
   TopChain.stop();
-  timer t2 = timer();
-  t2.reset();
-  for(int i = 0; i < 4 && t2.time(sec) < 5; i++) {
-    turnDeg(20);
-    turnDeg(-20);
-    goDeg(150);
-  }
-  //* make async to stop ball at top like manual
-  //! Line work working (Anything above works)
-  // dTrain.turnToHeading(0,deg);
-  // goDeg
-  goDeg(-100);
-  dTrain.turnToHeading(181.5,deg);
-  goDeg(-1000);
+  dTrain.turnFor(100,deg,true);
+  goDeg(1500);
+  dTrain.turnToHeading(180,deg);
+  
+  goDeg(-200);
+  lowerLever();
+  dTrain.turnToHeading(180,deg);
+  RightWheel.setVelocity(100,pct);
+  LeftWheel.setVelocity(100,pct);
+  goDeg(800);
+  // for(int i = 0; i < 1; i++){
+  //   removeClog();
+  //   spinUp();
+  //   goDeg(-100);
+  //   goDeg(200);
+  // }
+  RightWheel.setVelocity(60,pct);
+  LeftWheel.setVelocity(60,pct);
+  dTrain.turnToHeading(180,deg);
   spinUp();
-  wait(4,seconds);
-  wait(5,sec);
-  stopAll();
+  goDeg(-900);
+  spinUp();
+  spinUp();
+  
   
 }
 
@@ -363,7 +365,7 @@ void usercontroler(void) {
 //
 int main() {
   setup();
-  // autonomous();
+  autonomous();
   usercontroler();
   // Set up callbacks for autonomous and driver control periods.
   // Competition.autonomous(autonomous);
