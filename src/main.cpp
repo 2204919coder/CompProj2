@@ -38,10 +38,11 @@ motor sorter = motor(PORT14,false); //! Allways use timeout!!!
 optical colorSensor = optical(PORT10);
 distance distanceSensor = distance(PORT16);
 
-//yellow tower
-// aivision::colordesc ai_vision_4__COLOR = aivision::colordesc(1, 169, 170, 137, 40, 1);
+
+// AI Vision Color Descriptions
+aivision::colordesc AIVision18__COLOR1(1, 169, 170, 137, 40, 1);
 // AI Vision Code Descriptions
-// aivision ai_vision_4 = aivision(PORT18, ai_vision_4__COLOR, aivision::ALL_OBJECTS);
+vex::aivision AIVision18(PORT18, AIVision18__COLOR1);
 
 /*
 ------------------------------------------------------------------------
@@ -55,6 +56,7 @@ void intakeStop() {Intake.stop();}
 
 void calibrateLever() {
  Lever.setMaxTorque(100,pct);
+ Lever.setVelocity(100,pct);
  Lever.setTimeout(1,sec);
  Lever.spinFor(-100,degrees); //Closes door
  Lever.resetPosition();
@@ -205,6 +207,25 @@ void goDeg(int degIn) {
 void turnDeg(int degIn) {
   dTrain.turnFor(degIn,deg);
 }
+void faceYellow() {
+  // while(true) {
+    AIVision18.takeSnapshot(AIVision18__COLOR1);
+    if(abs(AIVision18.objects[0].centerX - 105) > 20) {
+      if(AIVision18.objects[0].centerX - 105 < 0) {
+        dTrain.turn(left);
+      } else {
+        dTrain.turn(right);
+      }
+    }
+    while(abs(AIVision18.objects[0].centerX - 105) > 20) {
+      // break;
+      wait(50,msec);
+      
+      AIVision18.takeSnapshot(AIVision18__COLOR1);
+    }
+    dTrain.stop();
+  // }
+}
 
 /*
 ----------------------------------------------------------------------
@@ -272,6 +293,9 @@ void autonomous(void) {
   RightWheel.setVelocity(60,pct);
   LeftWheel.setVelocity(60,pct);
   dTrain.setTurnVelocityMin(40);
+  faceYellow();
+  
+  wait(100,sec);
   spinUp();
   goDeg(1100);
   TopChain.stop();
@@ -285,12 +309,13 @@ void autonomous(void) {
   RightWheel.setVelocity(100,pct);
   LeftWheel.setVelocity(100,pct);
   goDeg(800);
+  wait(4,sec);
   // for(int i = 0; i < 1; i++){
   //   removeClog();
   //   spinUp();
   //   goDeg(-100);
   //   goDeg(200);
-  // }
+  // }    
   RightWheel.setVelocity(60,pct);
   LeftWheel.setVelocity(60,pct);
   dTrain.turnToHeading(180,deg);
