@@ -210,17 +210,15 @@ void turnDeg(int degIn) {
 void faceYellow() {
   // while(true) {
     AIVision18.takeSnapshot(AIVision18__COLOR1);
-    if(abs(AIVision18.objects[0].centerX - 105) > 20) {
-      if(AIVision18.objects[0].centerX - 105 < 0) {
-        dTrain.turn(left);
+    if(abs(AIVision18.objects[0].centerX - 160) > 10) {
+      if(AIVision18.objects[0].centerX - 160 < 0) {
+        dTrain.turn(left,20,velocityUnits::pct);
       } else {
-        dTrain.turn(right);
+        dTrain.turn(right,20,velocityUnits::pct);
       }
     }
-    while(abs(AIVision18.objects[0].centerX - 105) > 20) {
+    while(abs(AIVision18.objects[0].centerX - 160) > 3) {
       // break;
-      wait(50,msec);
-      
       AIVision18.takeSnapshot(AIVision18__COLOR1);
     }
     dTrain.stop();
@@ -293,9 +291,12 @@ void autonomous(void) {
   RightWheel.setVelocity(60,pct);
   LeftWheel.setVelocity(60,pct);
   dTrain.setTurnVelocityMin(40);
-  faceYellow();
+  // while (true){
+  //   faceYellow();
+  //   wait(3,seconds);
+  // }
   
-  wait(100,sec);
+  // wait(100,sec);
   spinUp();
   goDeg(1100);
   TopChain.stop();
@@ -308,6 +309,7 @@ void autonomous(void) {
   dTrain.turnToHeading(180,deg);
   RightWheel.setVelocity(100,pct);
   LeftWheel.setVelocity(100,pct);
+  faceYellow();
   goDeg(800);
   wait(4,sec);
   // for(int i = 0; i < 1; i++){
