@@ -283,14 +283,17 @@ void pre_auton(void) {
   
 }
 
-void autonomous(void) {
+void autonomous(void) { //Start Right side
+  dTrain.setTurnThreshold(0.7);
+  // dTrain.turnFor(180,deg);2300.
+  // return;
   // ..........................................................................
   // Insert autonomous user code here.
   // ..........................................................................
   InertialSensor.setHeading(23,deg);
   RightWheel.setVelocity(60,pct);
   LeftWheel.setVelocity(60,pct);
-  dTrain.setTurnVelocityMin(40);
+  dTrain.setTurnVelocityMin(25);
   // while (true){
   //   faceYellow();
   //   wait(3,seconds);
@@ -300,17 +303,22 @@ void autonomous(void) {
   spinUp();
   goDeg(1100);
   TopChain.stop();
+  removeClog();
+  BottomChain.spin(forward);
+  intakeIn();
   dTrain.turnFor(100,deg,true);
   goDeg(1500);
+  
+  dTrain.setTurnVelocityMin(15);
   dTrain.turnToHeading(180,deg);
   
   goDeg(-200);
   lowerLever();
-  dTrain.turnToHeading(180,deg);
+  // dTrain.turnToHeading(180,deg);
   RightWheel.setVelocity(100,pct);
   LeftWheel.setVelocity(100,pct);
-  faceYellow();
-  goDeg(800);
+  // faceYellow(); //! keep this maybe?
+  goDeg(900);
   wait(4,sec);
   // for(int i = 0; i < 1; i++){
   //   removeClog();
@@ -326,7 +334,7 @@ void autonomous(void) {
   spinUp();
   spinUp();
   
-  
+   
 }
 
 //! BUG: When named usercontrol, it seems to run anyways despite being commented out ¯\(ツ)/¯
