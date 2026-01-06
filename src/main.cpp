@@ -65,13 +65,13 @@ void calibrateLever() {
 bool isLeverDown = false;
 void lowerLever() {
   if(isLeverDown) return;
-  Lever.setTimeout(2,sec);
+  Lever.setTimeout(1,sec);
   Lever.spinFor(100,degrees);
   isLeverDown = true;
 }
 void raiseLever() {
   if(!isLeverDown) return;
-  Lever.setTimeout(2,sec);
+  Lever.setTimeout(1.5,sec);
   Lever.spinFor(-100,degrees);
   isLeverDown = false;
 }
@@ -262,7 +262,14 @@ void printController(char c) {
   Controller.Screen.print(c);
 }
 
+void fillScreen(color col) { 
+  Brain.Screen.setPenColor(col);
+  Brain.Screen.setFillColor(col);
+  Brain.Screen.drawRectangle(0, 0, 480, 240);
+}
+
 void setup() {
+  fillScreen(color::yellow);
   BottomChain.setVelocity(100,pct); //75 matchs top speed
   TopChain.setVelocity(100,pct);
   Intake.setVelocity(100,pct);
@@ -278,6 +285,7 @@ void setup() {
   Lever.setMaxTorque(100,pct);
   Lever.setVelocity(100,pct);
   Lever.setStopping(hold);
+  fillScreen(color::green);
 }
 void pre_auton(void) {
   
@@ -294,6 +302,7 @@ void autonomous(void) { //Start Right side
   RightWheel.setVelocity(60,pct);
   LeftWheel.setVelocity(60,pct);
   dTrain.setTurnVelocityMin(25);
+  closeDoor();
   // while (true){
   //   faceYellow();
   //   wait(3,seconds);
@@ -319,7 +328,9 @@ void autonomous(void) { //Start Right side
   LeftWheel.setVelocity(100,pct);
   // faceYellow(); //! keep this maybe?
   goDeg(900);
-  wait(4,sec);
+  raiseLever();
+  lowerLever();
+  wait(1,sec);
   // for(int i = 0; i < 1; i++){
   //   removeClog();
   //   spinUp();
@@ -331,7 +342,9 @@ void autonomous(void) { //Start Right side
   dTrain.turnToHeading(180,deg);
   spinUp();
   goDeg(-900);
+  removeClog();
   spinUp();
+  // wait(2,sec);
   spinUp();
   
    
@@ -357,7 +370,7 @@ void usercontroler(void) {
   Controller.ButtonRight.pressed(turnSpeedUp);
   LeftWheel.spin(forward);
   RightWheel.spin(forward);
-  
+  calibrateLever();
   while (true) {
     // Controller.Screen.clearScreen();
     // Controller.Screen.setCursor(0,0);
@@ -401,6 +414,7 @@ void usercontroler(void) {
 int main() {
   setup();
   autonomous();
+  wait(4,seconds);
   usercontroler();
   // Set up callbacks for autonomous and driver control periods.
   // Competition.autonomous(autonomous);
