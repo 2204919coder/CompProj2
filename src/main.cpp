@@ -285,13 +285,14 @@ void setup() {
   Lever.setMaxTorque(100,pct);
   Lever.setVelocity(100,pct);
   Lever.setStopping(hold);
-  fillScreen(color::green);
+  fillScreen(color::orange);
 }
 void pre_auton(void) {
   
 }
 
 void autonomous(void) { //Start Right side
+  fillScreen(color::green);
   dTrain.setTurnThreshold(0.7);
   // dTrain.turnFor(180,deg);2300.
   // return;
@@ -342,7 +343,9 @@ void autonomous(void) { //Start Right side
   dTrain.turnToHeading(180,deg);
   spinUp();
   goDeg(-900);
-  removeClog();
+  // removeClog();
+  TopChain.setVelocity(100,pct);
+  BottomChain.setVelocity(100,pct);
   spinUp();
   // wait(2,sec);
   spinUp();
@@ -353,6 +356,7 @@ void autonomous(void) { //Start Right side
 //! BUG: When named usercontrol, it seems to run anyways despite being commented out ¯\(ツ)/¯
 //! Simply just changed the name
 void usercontroler(void) {
+  fillScreen(color::orange);
   // Controller.rumble("...---...");
   
   // 1 is top, 2 is bottom
@@ -371,6 +375,7 @@ void usercontroler(void) {
   LeftWheel.spin(forward);
   RightWheel.spin(forward);
   calibrateLever();
+  fillScreen(color::green);
   while (true) {
     // Controller.Screen.clearScreen();
     // Controller.Screen.setCursor(0,0);
@@ -414,7 +419,8 @@ void usercontroler(void) {
 int main() {
   setup();
   autonomous();
-  wait(4,seconds);
+  fillScreen(color::red);
+  wait(10,seconds);
   usercontroler();
   // Set up callbacks for autonomous and driver control periods.
   // Competition.autonomous(autonomous);
