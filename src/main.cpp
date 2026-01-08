@@ -176,7 +176,9 @@ void closeDoor() {
   sorter.spinFor(155,degrees);
   isdoorOpen = false;
 }
-
+void fixEverything() {
+ calibrateLever(); 
+}
 void checkDoor() {
   if(colorSensor.isNearObject()) {
     if(colorSensor.hue() >= 150 && colorSensor.hue() <= 310) { //* blue ish
@@ -267,7 +269,9 @@ void fillScreen(color col) {
   Brain.Screen.setFillColor(col);
   Brain.Screen.drawRectangle(0, 0, 480, 240);
 }
-
+void faceGoal() {
+  dTrain.turnToHeading(180,deg);
+}
 void setup() {
   fillScreen(color::yellow);
   BottomChain.setVelocity(100,pct); //75 matchs top speed
@@ -369,8 +373,8 @@ void usercontroler(void) {
   Controller.ButtonL2.pressed(spinDown);
   Controller.ButtonA.pressed(removeClog);
   Controller.ButtonB.pressed(stopAll);
-  // Controller.ButtonX.pressed();
-  // Controller.ButtonY.pressed();
+  Controller.ButtonX.pressed(fixEverything);
+  Controller.ButtonY.pressed(faceGoal);
   Controller.ButtonUp.pressed(moveSpeedUp);
   Controller.ButtonDown.pressed(moveSpeedDown);
   Controller.ButtonLeft.pressed(turnSpeedDown);
@@ -379,6 +383,8 @@ void usercontroler(void) {
   RightWheel.spin(forward);
   calibrateLever();
   fillScreen(color::green);
+  RightWheel.setVelocity(0,pct);
+  LeftWheel.setVelocity(0,pct);
   while (true) {
     // Controller.Screen.clearScreen();
     // Controller.Screen.setCursor(0,0);
