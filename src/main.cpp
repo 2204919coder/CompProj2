@@ -338,7 +338,7 @@ void autonomous(void) { //Start Right side
   goDeg(1150);
   raiseLever();
   lowerLever();
-  wait(1,sec);
+  // wait(1,sec);
   // for(int i = 0; i < 1; i++){
   //   removeClog();
   //   spinUp();
