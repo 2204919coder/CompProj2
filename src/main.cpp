@@ -180,9 +180,9 @@ void closeDoor() {
 void checkDoor() {
   if(colorSensor.isNearObject()) {
     if(colorSensor.hue() >= 150 && colorSensor.hue() <= 310) { //* blue ish
-      openDoor();
-    } else { //* red ish
       closeDoor();
+    } else { //* red ish
+      openDoor();   
     }
   }
 }
@@ -286,23 +286,26 @@ void setup() {
   Lever.setVelocity(100,pct);
   Lever.setStopping(hold);
   fillScreen(color::orange);
+  TopChain.setMaxTorque(100,pct);
+  BottomChain.setMaxTorque(100,pct);
 }
 void pre_auton(void) {
   
 }
 
 void autonomous(void) { //Start Right side
+  Brain.resetTimer();
   fillScreen(color::green);
-  dTrain.setTurnThreshold(0.7);
+  dTrain.setTurnThreshold(0.8);
   // dTrain.turnFor(180,deg);2300.
   // return;
   // ..........................................................................
   // Insert autonomous user code here.
   // ..........................................................................
   InertialSensor.setHeading(23,deg);
-  RightWheel.setVelocity(60,pct);
-  LeftWheel.setVelocity(60,pct);
-  dTrain.setTurnVelocityMin(25);
+  RightWheel.setVelocity(80,pct);
+  LeftWheel.setVelocity(80,pct);
+  dTrain.setTurnVelocityMin(27);
   closeDoor();
   // while (true){
   //   faceYellow();
@@ -328,7 +331,7 @@ void autonomous(void) { //Start Right side
   RightWheel.setVelocity(100,pct);
   LeftWheel.setVelocity(100,pct);
   // faceYellow(); //! keep this maybe?
-  goDeg(900);
+  goDeg(1150);
   raiseLever();
   lowerLever();
   wait(1,sec);
@@ -338,8 +341,8 @@ void autonomous(void) { //Start Right side
   //   goDeg(-100);
   //   goDeg(200);
   // }    
-  RightWheel.setVelocity(60,pct);
-  LeftWheel.setVelocity(60,pct);
+  // RightWheel.setVelocity(80,pct);
+  // LeftWheel.setVelocity(60,pct);
   dTrain.turnToHeading(180,deg);
   spinUp();
   goDeg(-900);
@@ -418,13 +421,13 @@ void usercontroler(void) {
 //
 int main() {
   setup();
-  autonomous();
-  fillScreen(color::red);
-  wait(10,seconds);
-  usercontroler();
+  // autonomous();
+  // fillScreen(color::red);
+  // wait(10,seconds);
+  // usercontroler();
   // Set up callbacks for autonomous and driver control periods.
-  // Competition.autonomous(autonomous);
-  // Competition.drivercontrol(usercontroler);
+  Competition.autonomous(autonomous);
+  Competition.drivercontrol(usercontroler);
 
   // Run the pre-autonomous function.
   // pre_auton();
