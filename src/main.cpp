@@ -60,7 +60,7 @@ void calibrateLever() {
  Lever.setTimeout(1,sec);
  Lever.spinFor(-100,degrees); //Closes door
  Lever.resetPosition();
- Lever.setMaxTorque(50,pct);
+ Lever.setMaxTorque(100,pct);
 }
 bool isLeverDown = false;
 void lowerLever() {
@@ -72,7 +72,7 @@ void lowerLever() {
 void raiseLever() {
   if(!isLeverDown) return;
   Lever.setTimeout(1.5,sec);
-  Lever.spinFor(-100,degrees);
+  Lever.spinFor(-120,degrees);
   isLeverDown = false;
 }
 
@@ -182,9 +182,9 @@ void fixEverything() {
 void checkDoor() {
   if(colorSensor.isNearObject()) {
     if(colorSensor.hue() >= 150 && colorSensor.hue() <= 310) { //* blue ish
-      closeDoor();
-    } else { //* red ish
       openDoor();   
+    } else { //* red ish
+      closeDoor();
     }
   }
 }
@@ -270,8 +270,30 @@ void fillScreen(color col) {
   Brain.Screen.drawRectangle(0, 0, 480, 240);
 }
 void faceGoal() {
+  dTrain.setTurnVelocity(80,pct);
+  dTrain.setTurnVelocityMin(40);
+  dTrain.setTurnThreshold(2);
+  dTrain.setTimeout(3,seconds);
   dTrain.turnToHeading(180,deg);
 }
+bool autoLineRunning = false;
+void autoLine() {
+  
+  autoLineRunning=true;
+  RightWheel.setVelocity(80,pct);
+  LeftWheel.setVelocity(80,pct);
+  dTrain.setDriveVelocity(80,pct);
+  fillScreen(color::orange);
+  dTrain.driveFor(50,distanceUnits::cm);
+  fillScreen(color::black);
+  dTrain.setTimeout(2,seconds);
+  dTrain.turnToHeading(180,deg);
+  
+  RightWheel.setVelocity(0,pct);
+  LeftWheel.setVelocity(0,pct);
+  autoLineRunning=false;
+}
+
 void setup() {
   fillScreen(color::yellow);
   BottomChain.setVelocity(100,pct); //75 matchs top speed
@@ -371,24 +393,27 @@ void usercontroler(void) {
   Controller.ButtonR2.pressed(spinUpAdv);
   Controller.ButtonL1.pressed(raiseLever);
   Controller.ButtonL2.pressed(spinDown);
-  Controller.ButtonA.pressed(removeClog);
+  // Controller.ButtonA.pressed(autoLine);
   Controller.ButtonB.pressed(stopAll);
-  Controller.ButtonX.pressed(fixEverything);
+  Controller.ButtonX.pressed(removeClog);
   Controller.ButtonY.pressed(faceGoal);
   Controller.ButtonUp.pressed(moveSpeedUp);
   Controller.ButtonDown.pressed(moveSpeedDown);
   Controller.ButtonLeft.pressed(turnSpeedDown);
   Controller.ButtonRight.pressed(turnSpeedUp);
+  RightWheel.setVelocity(0,pct);
+  LeftWheel.setVelocity(0,pct);
   LeftWheel.spin(forward);
   RightWheel.spin(forward);
   calibrateLever();
   fillScreen(color::green);
-  RightWheel.setVelocity(0,pct);
-  LeftWheel.setVelocity(0,pct);
   while (true) {
     // Controller.Screen.clearScreen();
     // Controller.Screen.setCursor(0,0);
     // Controller.Screen.print(colorSensor.hue());
+    if(autoLineRunning) {
+      continue;
+    }
     displayInfo();
     advSpinCheckLogic();
     if(isDoorAuto) {
